@@ -1,0 +1,425 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Car Price Prediction</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background: url("b.jpg") no-repeat center center fixed;
+        background-size: cover;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .navbar {
+        display: flex;
+        justify-content: space-between;
+        padding: 1em;
+        color: white;
+      }
+      .navbar .right-links {
+        display: flex;
+        font-family: "Times New Roman", Times, serif;
+        align-items: center;
+      }
+      .navbar .right-links a {
+        color: rgb(240, 235, 235);
+        text-decoration: none;
+        padding: 0.5em 1em;
+        margin-left: 10px;
+      }
+      .navbar a:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+
+      main {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-bottom: 220px;
+      }
+
+      .container-form {
+        width: 50%;
+        max-width: 1000px;
+        margin: 20px;
+        background-color: #0f0e0e;
+        color: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        overflow-y: auto;
+      }
+
+      .container-form h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-row {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .half-column {
+        flex: 0 0 calc(50% - 5px); /* Adjusted width to account for gap */
+        margin-bottom: 15px; /* Added margin-bottom to match other form elements */
+      }
+
+      .half-column label {
+        margin-bottom: 5px;
+        display: block;
+        font-weight: bold;
+        font-size: 14px;
+      }
+
+      .half-column input,
+      .half-column select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+      }
+      /* Adjusted width to match other selects */
+      #torque,
+      #owner {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        margin-bottom: 15px; /* Added margin-bottom for consistency */
+      }
+
+      button[type="submit"] {
+        padding: 10px 20px;
+        background-color: #04aa6d;
+        color: white;
+        border: none;
+        text-align: center;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        display: block;
+        width: 18%;
+      }
+
+      button[type="submit"]:hover {
+        background-color: #555555;
+      }
+
+      footer {
+        width: 100%;
+        padding: 1em;
+        background-color: rgba(0, 0, 0, 0.5);
+        font-family: "Poppins";
+        color: white;
+        text-align: center;
+      }
+
+      .container {
+        background-color: #0f0e0e;
+      }
+
+      /* Media Queries */
+      @media only screen and (max-width: 768px) {
+        .main-content {
+          padding: 1em;
+        }
+        .headline {
+          font-size: 2em;
+        }
+      }
+      @media only screen and (max-width: 600px) {
+        .navbar {
+          flex-direction: column;
+          align-items: center;
+        }
+        .navbar .right-links {
+          margin-top: 1em;
+        }
+        .navbar .right-links a {
+          margin-left: 0;
+          margin-right: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div class="navbar">
+          CAR PRICE
+          <div class="right-links">
+            <a href="/">Home</a>
+            <a href="#">Predict</a>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main>
+      <div class="container-form">
+        <h2 class="hd">Car Price Prediction Form</h2>
+        <form id="carForm" action="/predict" method="post">
+          <div class="form-group">
+            <div class="form-row">
+              <div class="half-column">
+                <label for="name">Name:</label>
+                <select id="name" name="name">
+                  <option value="" selected disabled>Select car model</option>
+                  {% for car_name in car_names %}
+                  <option value="{{ car_name }}">{{ car_name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="half-column">
+                <label for="fuel">Fuel:</label>
+                <select id="fuel" name="fuel">
+                  <option value="" selected disabled>Select fuel type</option>
+                  {% for fuel in fuels %}
+                  <option value="{{ fuel }}">{{ fuel }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <div class="half-column">
+                <label for="seller_type">Seller Type:</label>
+                <select id="seller_type" name="seller_type">
+                  <option value="" selected disabled>Select seller type</option>
+                  {% for seller in sellers %}
+                  <option value="{{ seller }}">{{ seller }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="half-column">
+                <label for="gear_box">Gear Box:</label>
+                <select id="gear_box" name="gear_box">
+                  <option value="" selected disabled>Select gear box</option>
+                  {% for gearbox in gearboxes %}
+                  <option value="{{ gearbox }}">{{ gearbox }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <div class="half-column">
+                <label for="owner">Owner Type:</label>
+                <select id="owner" name="owner">
+                  <option value="" selected disabled>Select owner type</option>
+                  {% for owner in owners %}
+                  <option value="{{ owner }}">{{ owner }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="half-column">
+                <label for="torque">Torque:</label>
+                <select id="torque" name="torque">
+                  <option value="" selected disabled>Select torque type</option>
+                  {% for torque in torque %}
+                  <option value="{{ torque }}">{{ torque }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <div class="half-column">
+                <label for="production_year">Year:</label>
+                <input
+                  type="number"
+                  id="production_year"
+                  name="production_year"
+                  min="1991"
+                  max="2021"
+                  step="1"
+                  value="2010"
+                  placeholder="Enter Year between (1991 - 2021)"
+                />
+                <!-- <select id="production_year" name="production_year">
+                  <option value="" selected disabled>Select torque type</option>
+                  {% for production_year in prod_year %}
+                  <option value="{{ production_year }}">
+                    {{ production_year }}
+                  </option>
+                  {% endfor %}
+                </select> -->
+              </div>
+              <div class="half-column">
+                <label for="km_driven">Kilometers Driven:</label>
+                <input
+                  type="number"
+                  id="km_driven"
+                  name="km_driven"
+                  min="0"
+                  max="500000"
+                  step="1000"
+                  value="100000"
+                  placeholder="Enter Kilometers Driven"
+                />
+                <!-- <select id="km_driven" name="km_driven">
+                  <option value="" selected disabled>
+                    Select km_driven type
+                  </option>
+                  {% for km_driven in kmdriven %}
+                  <option value="{{ km_driven }}">{{ km_driven }}</option>
+                  {% endfor %}
+                </select> -->
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <div class="half-column">
+                <label for="mileage">Mileage (kmpl):</label>
+                <input
+                  type="number"
+                  id="mileage"
+                  name="mileage"
+                  min="5"
+                  max="30"
+                  step="0.1"
+                  value="15"
+                  placeholder="Enter Mileage (kmpl)"
+                />
+                <!-- <select id="mileage" name="mileage">
+                  <option value="" selected disabled>Select mileage</option>
+                  {% for mileage in mileage %}
+                  <option value="{{ mileage }}">{{ mileage }}</option>
+                  {% endfor %}
+                </select> -->
+              </div>
+              <div class="half-column">
+                <label for="engine">Engine Volume (L):</label>
+                <input
+                  type="number"
+                  id="engine"
+                  name="engine"
+                  min="0.8"
+                  max="6.5"
+                  step="0.1"
+                  value="2.0"
+                  placeholder="Enter Engine Volume between (0.8 - 6.5)"
+                />
+                <!-- <select id="engine" name="engine">
+                  <option value="" selected disabled>Select engine</option>
+                  {% for engine in engine %}
+                  <option value="{{ engine }}">{{ engine }}</option>
+                  {% endfor %}
+                </select> -->
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <div class="half-column">
+                <label for="max_power">Max Power (HP):</label>
+                <input
+                  type="number"
+                  id="max_power"
+                  name="max_power"
+                  min="55"
+                  max="660"
+                  step="1"
+                  value="200"
+                  placeholder="Enter Max Power between (55 - 660)"
+                />
+                <!-- <select id="max_power" name="max_power">
+                  <option value="" selected disabled>Select max power</option>
+                  {% for max_power in maxpower %}
+                  <option value="{{ max_power }}">{{ max_power }}</option>
+                  {% endfor %}
+                </select> -->
+              </div>
+              <div class="half-column">
+                <label for="seat">Number of Seats:</label>
+                <input
+                  type="number"
+                  id="seat"
+                  name="seats"
+                  min="2"
+                  max="8"
+                  value="5"
+                  placeholder="Enter Number of Seats between (2 - 8)"
+                />
+                <!-- <select id="seats" name="seats">
+                  <option value="" selected disabled>Select seat type</option>
+                  {% for seats in seat %}
+                  <option value="{{ seats }}">{{ seats }}</option>
+                  {% endfor %}
+                </select> -->
+              </div>
+            </div>
+          </div>
+          <div class="col-md-10 form-group" style="text-align: center">
+            <button class="btn btn-primary form-control" onclick="send_data()">
+              Predict Price
+            </button>
+          </div>
+        </form>
+        <br />
+        <div class="row">
+          <div class="col-12" style="text-align: center">
+            <h4><span id="prediction"></span></h4>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script>
+      function form_handler(event) {
+        event.preventDefault(); // Don't submit the form normally
+      }
+      function send_data() {
+        document.querySelector("form").addEventListener("submit", form_handler);
+
+        var fd = new FormData(document.querySelector("form"));
+
+        var xhr = new XMLHttpRequest({ mozSystem: true });
+
+        xhr.open("POST", "/predict", true);
+        document.getElementById("prediction").innerHTML =
+          "Wait! Predicting Price.....";
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == XMLHttpRequest.DONE) {
+            document.getElementById("prediction").innerHTML =
+              "Prediction: Nu." + xhr.responseText;
+          }
+        };
+
+        xhr.onload = function () {};
+
+        xhr.send(fd);
+      }
+    </script>
+    <footer>
+      &copy; Copyright Car Price. All Rights Reserved<br />
+      Designed by Group 5
+    </footer>
+  </body>
+</html>
